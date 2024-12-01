@@ -1,0 +1,70 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": {
+    "title": { "fontSize": 16 },
+    "axis": { "labelFontSize": 12, "titleFontSize": 14 }
+  },
+  "hconcat": [
+    {
+      "title": "Drought Levels Across the USA",
+      "width": 500,
+      "height": 300,
+      "data": {
+        "url": "agg_data.csv",
+        "format": { "type": "csv" }
+      },
+      "mark": "geoshape",
+      "transform": [
+        {
+          "lookup": "State",
+          "from": {
+            "data": { "url": "us-states.json", "format": { "type": "topojson", "feature": "states" } },
+            "key": "id",
+            "fields": ["D0", "D1", "D2", "D3", "D4"]
+          }
+        },
+        { "filter": "datum.DroughtLevel == 'D0'" }
+      ],
+      "encoding": {
+        "color": {
+          "field": "DroughtLevel",
+          "type": "quantitative",
+          "scale": { "scheme": "reds" },
+          "title": "Drought Level"
+        },
+        "tooltip": [
+          { "field": "State", "type": "nominal", "title": "State" },
+          { "field": "DroughtLevel", "type": "quantitative", "title": "Drought Level" }
+        ]
+      },
+      "projection": { "type": "albersUsa" }
+    },
+    {
+      "title": "Drought Levels for Selected States",
+      "width": 500,
+      "height": 300,
+      "data": {
+        "url": "agg_data.csv",
+        "format": { "type": "csv" }
+      },
+      "transform": [
+        { "fold": ["D0", "D1", "D2", "D3", "D4"], "as": ["Drought Level", "Percentage"] },
+        { "filter": "datum.State == 'selected_state'" }
+      ],
+      "mark": "bar",
+      "encoding": {
+        "x": { "field": "Drought Level", "type": "nominal", "title": "Drought Level" },
+        "y": { "field": "Percentage", "type": "quantitative", "title": "Percentage (%)" },
+        "color": {
+          "field": "Drought Level",
+          "type": "nominal",
+          "scale": { "scheme": "reds" }
+        },
+        "tooltip": [
+          { "field": "Drought Level", "type": "nominal", "title": "Drought Level" },
+          { "field": "Percentage", "type": "quantitative", "title": "Percentage" }
+        ]
+      }
+    }
+  ]
+}
